@@ -1,0 +1,99 @@
+name: Build Capri APK (one file)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/setup.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Generate Capri app sources
+        shell: bash
+        run: |
+          cat > /tmp/capri.b64 <<'BASE64'
+          H4sIAIRk5moC/+1be3MU15Xnb32Kq/5remn1PDR6oLHAILOBFAKV0O5WKkm5WjOtUUet7nF3D6BVqEKSDaQgYCg7JjF2YrLO/pWy
+          EBoQen6Fnq/gT7Lncfs1M/I6VYFKwkyVpOn7Ouee1+/cc1t6Xs+/P2PcuGAaNdM78UY+Bf4c97dQGB5OvmN7sVAqFk+IGyfewqfp
+          B4YH5E+8m5/SmFgOrGVzsjh2arg8Xjo1Xtbx72hx4ET/86//MRqNvO9V88uG5eR/ZVwz8lV3OV81Gp6F3xqGY7lOfhp6z1YD65oV
+          rOg46m/2/9FyOe33xbGRonwulcqlkRPFkdJYsTxaGB6B/tJwaax8QhTepv97rhv80DjXsD70Fw3PrP1L6b9hVJeMuilA1zppXY+1
+          XhkYsJYbrhcIw6l5rlXTwVj0f6t0trp+j8a6ZzQWraqvT7m26x3fPbfSMBeMqnn8iJpnXDfmbVP/iWfULNMJPpANXVOqrhNAfw9u
+          rlnm9R7N161a3UyPR9PWm4FlY9tAozlvW1VRtQ3fF2kXEOYNIFTzRdywOiAWLMewheUEYr4+SbvWvfp8rljSigWtNKJqomE5S6me
+          0siINjaqFcfL0FddMZxUH7SXSmNaqVxQKwPikuWYhnfJWHGbgUBD1YTt1itiDvj4T9iaWHbdmiaMhQUTGALNifM1K8Be4KfRDGAJ
+          5GsRFgn8yUJFzIIE3GXhOfVJB6bzY06tiAuGvzhtNN67GniWU9f4z89/eVrYwIJPg6Mhp3PIWjRCoBvB4qtK+EV4EG6Grfbd9n1N
+          KJoSfhvu67pOX78J99ob7bvQ/5r7/hp9eRIetNdh1i34WYMVDqMpX4UtER6GL8OdcBvm7YWbmsB+6vwj9LyAn+1wh5f5TrTXgcK6
+          CI+wub0R7vOkCep+GrZgJWiGfiB12L4Dy+7z1M+B7l64I6ANWABmgAj03Ezvctmq1WwTtwlk7onwVbhJQzfDLdjZQ961AJot2M5D
+          AeT32vfC5zBqvX0fRj5UYMVwS8CuQATt9SGQyA7MB6prMIe3gjOBOMoBN7ELP6+RGZq7jz3QDdwjUZiMy8Ku4eEQJ+LwfZi4CQN3
+          mCBuN2KJ94ZMEqlwU8Ao3MIhrCjHI1lcX4TPcZNAkMiSqGEeDN6G35/Aehu4FJH4LS0Bct8CCijBW0jhOXz5DVnDOi3GlHeyugYJ
+          7dMaKFLSWEsKEh5AsyzbiBJZ175gnnH/UpXhC5L2w4ykWVrA6iHxxLKi7a1Flsgs7cPkV8DIbnuDWAGJooC30drad5CUiDS+TSLk
+          XdPCIF6cjYzRYrg32CwTIjJ3gFArWrdD0VvMHhrjXRS0oHVQR7ipFmox3JFaTFZGJYCxwq5QfK9R7MB6e01KCCxkr/0AxA+/kSL2
+          8dAWb+wVsYAmc6t9LxE+eR40b6ZseA2FgzYa7tHq22R4m0gUBb8Texkxz027SBhFTuy3MrKSRr1JzpPIi6ya9IQswOIvWCrhNs1e
+          E6Tv59y3hbYDfIEk9lCvbAdoYCy4FtMk001ixwHFDWYRDYUeE5lu0bBWbNLQtE3SAEuF4Q9SjG4BnUeCuNkDc0PtZuIEogMECR3i
+          yiD8QCyD3+L7W58xdRQgMHSGGn//Df4J/wCtuyIRJjoADQifMRX0bEHyJBdHSZKiY0WGO0QlfEyOSFFpF6WP22hhDOTuT9mSI6te
+          I128TBPEkItqh1mv0WMGaXPvX7lmep5VM4UExmuAocJ1pjzTCMzcuaYDoVHMq6t+s2F6etwxD7gioQfQdsYzF0zPdKqmnyuoOrRc
+          dIKcwgMUDfBO+KZZQzBadJdN+HtzgClxMyAtYZEOuJZLAEAKgHWHMBWpAgDpq/aGRlYPe+HdoqeTCeux3BkO7rYfhXsymKKdbZMT
+          kFgQWpKg8UDv0kuLPRcR5YDcA4YfZpyv/UkES7fIlNHc18ioXqOVhI974QLa9l1eUxoQxY5D2ARtGFULTCBpcNa7CH+4R9R1+FnK
+          VaXz7JFdgO/ABp7+EJZIFwS7ASZ1Bu904OoNKoljkrvG4tnG0Bz7mq7cxOQhrcivUR5RlO9QICQJmA308mYdRdbp0zpDPQ4lhwcM
+          Qm/N4hj7hwQDAi8iTqp+hv6xDrZwRPj9Wpc+sYFBDCEpDmJE6ktCCkoXpF532D+3OFBjBFnvaTAcLbcQeFBNg91yYQPfIwq9zfvp
+          EOdXDMG9RPGVjPpxcDyiRCfKJbYiLbfvDXZuZ5+kKNMaxtltGv6Sg7ceiwvBHO10L2UWzMotsv8dlm7PDYI6aendbtXznojTMwJN
+          EJa7D5pBuD2kliPcGBAG62YvgucNlLZM0EhV+6SUvRjMj8mjSPuPMO1A9T2XOcod2KcgC6VsBpwfh/05gQ6yJdTRAcKQjLaMbWuA
+          g7eknl+hgLsE8D8E5Lfa612b/xZT00xCJJ3/OU6IKaDy0M0ZZVgbv42C+xHMvA20N2WUOIxEQLldlKTssnmQi+wxMIV/zGqbvOBp
+          Orc4hG3dS5nZ11IVHIqA5gtcVROcGkU7QMtDzOs2hCSLQ2/okgYaSgsccJOzdMSnQ7ZnDj0cHSh/oTyHHAe0PsjBWyZoDziioh+3
+          yFLZ+Sl2h9uprAONhuWZjWNoEi8pZwbZQ17AI7V0Fnd4hr2uVzIjYlljXgt61Thlf4FOgHnoPUHJAQLaI+SgS05Po1S1t4yi8wiy
+          R4oeItN/TkaN5kJODXZMebegw8kabmGQjbpHUGd1Y0y7x1Cyh5BFZgsjpJDQ+G8DEYixZ47DxjVCpyNGJDp7cDTe6eEWT9h8utEc
+          pkVOLE2MaEanvzhDRgPn/vYDjTWwTsZxn3MajTIDuZYWowTF9/CAA+YGMLh9Jj6o0qksdTwc5CjDB0dQPCVmKUvohXN4esJUoGtj
+          n2Xz6sPIMPm0skNs7adMTob2TaKKjN0eiiw5c16TZ0hE3SwsclxEPd2JjkFbsUe0js0P5KYgLeusyAh/0WiYOaw1VLGUoeE3P/Dc
+          JVNd7Rpco3JCZzMkfDXdNwOqheRombjFc0xvFoY3/VypJFuv0vK5kibpVDwzaHqOqGHeGBdIbGPetHMsbOEzX9Z/m1rMqroajw2I
+          r+gxFyxavloJkBa25dIPV2GNHC6UasswTq0zRq0GdHPFsobVIPwdsxnE6a3lWEHEYWAFNojsatVzbZuY8qvEVdIi+cJqEPWka0Sp
+          PqR/xUMBG1gZyhWT5oitUkErlTX6nXSeM6pLdc+FnJ73M19XK35VhylEHIdBAyqFam7U6FfVSizFxUmWOW1FK41qWP1SK4skJln0
+          yzlN29aiJ/3clUsfSA4iOotJ+s+ngVUSkwJZ+6cQ7P4UPhEinxfi8sWfXJgTUxfnfqaoqboYLiv5UL5/+hchvv/iNwLRB349/csv
+          nF84yULw/ZmsoSBs0pEXKyi3MUxtZeCFvDyFFHDWLI1rWMJTK7QT2CPYNVYGc/KvPnX+8tz52aQ/EXCOvaZwY2GhVCyWSyaLqkMS
+          OE+txCW+eFewFzwrcMmHoO3hhFBO8nkKtcpyz6wVr6JWsHIYrYXBpKPw0MK1crzY6WKhcIaP1C8Z45UJ2TOMHduY6GGyKPFCDlEk
+          Zr5CwIIGVSuOSVllmEJO1Mp8MwjATOk8QLlWXM3JqUOnq4tGkFNTox5TgrdDYWxbHlfXKVTJGQbt089M4iLkHQy10bHpY1kU2eRZ
+          ntmwV3IelUXRsWB6mrUob9/j5Dgq0RC9efQ/NTFbOSvt2Nps03EoBDJ36uo5GiTmyZP5QfrwfBx3OCYkDRR7imOy5axtTxkNH8zE
+          9tOj2Hu5sPxfFy7OnZd9Pc1vuFQ0hmPzS0cUnf/MGJ6x7ItGV8TJ9OeGitoQhLgGEpo2vLoFCiho4xr8dCh9XmtIhq44U7ZVXbpk
+          +RBPTC93LdKd7jWdtEBjjUah4HH4BfjwE0CrrwFDPw9/Dwp+Bq1Pwu+URGvf3/6UT9doMNusLA4p4JMgIqmgJXNlguEavl01UZVy
+          BXiOLAq/ZzlKTVdX2SlOTsKDbn7UBI1ksnz1zPBEqdJdCjFrsB0V04RMRYT/qnj5AjapVuIak9sI/EnmFRYjnipsuNjzc8+p6w5Y
+          AC6GDbptOvVgUf0lMS75TZv4qoQkruRn5nNTvMJJWQbPjJFtySCsgWVGYEPcHUuPWY6gWV1F0zprm17wgWXYbl0/17TsGhgE+QOZ
+          NToCQcAm+yEdJ6hr2vR9ow6QTE8zrm8F1jXzXOS4n2OGB6qvadePcXKcdtmsG5lpX2COhXVSefwG0IKBi+71VHGKI1Nkkv8LBvkM
+          4rJI4OVHmiLs+Dg4R2Ecg+aRO8EQwIhaLZJDSkhJDitrDnhsgvz1a0yAH1HlNltKo5SawYMukYit6F5JskQdyNQFC02WNnXE9SqR
+          kMZzacfYJDRh3DHokxpyTOSK+6+CrdgmKU0GvIwYaFw6YAMmHKWS2Pss89XI6CZ54bqMtKoeuNyFXz0Lb8ashZyvW/755QZguqqy
+          q2RF/QwL6b6EtsxWcopyvFoMx78O5u2rUtg3syAYFcW4TkxsY7zJFsyOXz2JDx0zMp557KjYXRPm4qiXUJRyvL7oapkUuzuz5kwD
+          Bp5UMLPwKRdIpcq9s6ICwFJJw6/l0eHhkeobAKcRAKcR9rHIigLEpiRUSj0lgUp++2jSB3u55ELnlOFDTovU3aqBMcprKirZzkd0
+          OW0gLSXtgIr6619n+l5RcXiTLhggkVEiUxNcH0n89rv4gqr3DQbZSxfp+FKoi3ByyLsrM66YtEzySpjkUVFN3qqtc/oj+HIN6+R0
+          YcJlHKI/geb0gk7Xu/FtRKZgJaIVuy+bBrvZf0G1xLUecjuiCuYnaXlRtKOLvPjELMJv5U1gXEzruDyguoEsn2EE7GJhV17TcKGs
+          iw/uxguWNCtfRneAmWJPx4WiTlczySVfN/HOC2GuotAldpraN7JcvIt1rvhOD5b/szQQrOTQRegrsrR1uuvtaS848mEPI8Uyygaq
+          IaH6XTriCziY8S1TqijdSpUZDzNVwcHeW43rumk6j+UFKpXLjsgEsba5IXN/uRE5PI3uSeTiHD0Ca0jnCaHDL8FYfwcJ5FfwHfE6
+          C63yjJTKOvAy5rD9MUkb9DGUvnpv38fDIh0cd2kPeATiS/ndIWIUjw8tXZQKhcLJ6Nb+Od/zUMH2tUhK9eGuJk6J7AmHrHtNXt5j
+          wWeTHpODIGLwjiBf243Kv1TA43IPVgLpTYznNOSA64E4I76ywIt2UuYjIPAqfW9/wN1IgLh8wXyQepF5nPTXuBolUKBDkixSOOCo
+          8TEdr3cyzEWXDHiLBaOnVuZNr9F0lnQFsSKdDvy4hOrm8ReXCDaQg/s+3SvGt40336U3H/X++7/993+73v8dHRsZ7b//+869/3uW
+          34ucNhxrwfQD/cay/ffy/+Pf/4W+sY73f4tjhXL//d+38nlvWSpbgLIdf0K+GjupLAZBYyKf96uL5rLh68k7tst5o7GUB9jMyzbl
+          9HtYm7KqVJOIXq6dCGCiOam8Hz37wYpt5uewVZ82AtOzDFu/7J6lct45w1PimZRqTaaPsXFX0zf9KRvPI3CmnPOMhQWrOqlQDQDZ
+          iF7HjYY7BrKgp9/dTdYyb+A7vybsNfCaON2iq4yhBcsG7ni11H54rUgOPFaXJcrpsxcvK/nT74EIzLrrrfzwpGiUfunsf1yeunB+
+          FqfmO6jno83g10S88BRp7PTfI0L/Y+B/uRv/S338fyv4P94L/0dK5VNj/QTgHcH/eayw4z9c1GxTXwr8N+H/P4T/kG924H95FP2/
+          j/9v4f9/7CZWQMWqsGo5Bf8LKPXPPhHoKKq4OSDb8V9dENX8hlE1xaRQevznkDKA/0/UsGzzam0JxgyPDIiauWA0bXxfYMGqA7nU
+          8hdrx61TEcuWw2uUyhUBmqqbQbRmRcCx3odhU24NOSnGDZeBP1yyqBcU8Y4d6P8p8b/Ujf+FPv6/Ffwf7YX/w8VTfZ95Jz6+GQSW
+          U/ffIPz/v/hfLpU78X9krNDH/7eH/9OGY9ThYO4EgMye2cAXJ1zPMjEvqLtunV7LFMvGNdOZgkGeYeMzm8wMrTADR2lsFTcBcGtm
+          w3RqplNdmTV9124iyB9LYhrQG+9ic7Odjf9+9uKlD69c/nBm9spPz0/NfTh7fubKVaD7IxkkVlCtM577K7Ma6I5MC6Ywy5hKkhXL
+          qdrNmplTJiApUdR3KvL1z//98383/pfLY+Pj/QzgHfi86bP/j8H/YqHr/F8o9ev//1Dnf3myFsq4PqYPK3R8XxFUeBf983X/0//0
+          P/3PP9/n/wACvjr3AFAAAA==
+          BASE64
+          base64 -d /tmp/capri.b64 | tar -xz
+      - name: Build installable APK
+        run: gradle --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CapriCompanion-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
